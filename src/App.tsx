@@ -1,10 +1,10 @@
-import { useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { CORPUS, chunkDocs, docColor, SENT_CHUNKS, QUERIES, retrieve, project2D, tfVector } from './rag'
 
 type Mode = 'llm' | 'rag'
 
 /* ------------------------------------------------------------------ */
-/* Theme                                                               */
+/* Theme + motion helpers                                              */
 /* ------------------------------------------------------------------ */
 
 function useDarkMode() {
@@ -26,6 +26,31 @@ function useDarkMode() {
     }
   }, [dark])
   return { dark, setDark }
+}
+
+function Reveal({ children, className = '' }: { children: ReactNode; className?: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  const [shown, setShown] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(
+      ([e]) => {
+        if (e.isIntersecting) {
+          setShown(true)
+          io.disconnect()
+        }
+      },
+      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' },
+    )
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return (
+    <div ref={ref} className={`ee-reveal ${shown ? 'ee-in' : ''} ${className}`}>
+      {children}
+    </div>
+  )
 }
 
 function SunMoon({ dark }: { dark: boolean }) {
@@ -59,14 +84,17 @@ function ScrollProgress() {
   }, [])
   return (
     <div className="fixed inset-x-0 top-0 z-[60] h-0.5">
-      <div className="h-full bg-primary transition-[width] duration-150 ease-out" style={{ width: `${p * 100}%` }} />
+      <div
+        className="h-full transition-[width] duration-150 ease-out"
+        style={{ width: `${p * 100}%`, background: 'linear-gradient(90deg, var(--color-primary), var(--color-accent))' }}
+      />
     </div>
   )
 }
 
 function TopBar({ dark, setDark }: { dark: boolean; setDark: (v: boolean) => void }) {
   return (
-    <header className="sticky top-0 z-50 border-b border-line/70 bg-bg/80 backdrop-blur-md">
+    <header className="sticky top-0 z-50 border-b border-line/70 bg-bg/75 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         <div className="flex items-center gap-2 text-sm font-medium">
           <span className="text-primary">✦</span>
@@ -93,7 +121,7 @@ function SectionLabel({ n, title }: { n: string; title: string }) {
   return (
     <div className="mb-4 flex items-center gap-3 text-xs font-semibold uppercase tracking-[0.18em] text-primary">
       <span>{n}</span>
-      <span className="h-px w-8 bg-primary/40" />
+      <span className="h-px w-8" style={{ background: 'linear-gradient(90deg, var(--color-primary), transparent)' }} />
       <span>{title}</span>
     </div>
   )
@@ -107,9 +135,7 @@ function Tag({ tone, children }: { tone: 'good' | 'bad' | 'amber' | 'primary'; c
     primary: 'bg-primary-soft text-primary-ink',
   }
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${tones[tone]}`}>
-      {children}
-    </span>
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${tones[tone]}`}>{children}</span>
   )
 }
 
@@ -147,20 +173,13 @@ function Slider({
           {value} {unit}
         </span>
       </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        value={value}
-        onChange={(e) => onChange(+e.target.value)}
-        className="h-1.5 w-full cursor-pointer appearance-none rounded-full bg-line accent-[var(--color-primary)]"
-      />
+      <input type="range" className="ee-range" min={min} max={max} value={value} onChange={(e) => onChange(+e.target.value)} />
     </label>
   )
 }
 
 function H2({ children }: { children: ReactNode }) {
-  return <h2 className="mb-5 font-display text-3xl text-ink sm:text-4xl">{children}</h2>
+  return <h2 className="mb-5 font-display text-[2rem] font-medium leading-tight tracking-[-0.01em] text-ink sm:text-[2.6rem]">{children}</h2>
 }
 
 function Lede({ children }: { children: ReactNode }) {
@@ -168,14 +187,20 @@ function Lede({ children }: { children: ReactNode }) {
 }
 
 function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <div className={`rounded-2xl border border-line bg-surface p-5 shadow-sm sm:p-7 ${className}`}>{children}</div>
+  return (
+    <div className={`rounded-2xl border border-line bg-surface p-5 shadow-sm transition-shadow duration-300 hover:shadow-md sm:p-7 ${className}`}>
+      {children}
+    </div>
+  )
 }
 
-function Section({ n, title, children }: { n: string; title: string; children: ReactNode }) {
+function Section({ id, n, title, children }: { id?: string; n: string; title: string; children: ReactNode }) {
   return (
-    <section className="mx-auto max-w-3xl border-t border-line/60 px-6 py-16">
-      <SectionLabel n={n} title={title} />
-      {children}
+    <section id={id} className="mx-auto max-w-3xl border-t border-line/60 px-6 py-16 sm:py-20">
+      <Reveal>
+        <SectionLabel n={n} title={title} />
+        {children}
+      </Reveal>
     </section>
   )
 }
@@ -202,15 +227,23 @@ function Scatter({ highlightIds = [], queryText }: { highlightIds?: number[]; qu
 
   const plotted = pts.map((p) => ({ ...p, px: sx(p.x), py: sy(p.y) }))
   const hi = plotted.filter((p) => hl.has(p.c.id))
-  // place the query marker among the passages it actually retrieved
   const q =
     queryText && hi.length
       ? { px: hi.reduce((s, p) => s + p.px, 0) / hi.length, py: hi.reduce((s, p) => s + p.py, 0) / hi.length - 4 }
       : null
 
+  const grid = [0.25, 0.5, 0.75]
+  const ptTransition = 'cx .45s ease, cy .45s ease, r .2s ease, opacity .3s ease'
+
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full" role="img" aria-label="Embedding space scatter plot">
+    <svg viewBox={`0 0 ${W} ${H}`} className="h-auto w-full select-none" role="img" aria-label="Embedding space scatter plot">
       <rect x="1" y="1" width={W - 2} height={H - 2} rx="14" fill="none" stroke="var(--color-line)" />
+      {grid.map((f) => (
+        <g key={f} stroke="var(--color-line)" strokeWidth="1" opacity="0.45">
+          <line x1={pad + f * (W - 2 * pad)} y1={pad} x2={pad + f * (W - 2 * pad)} y2={H - pad} />
+          <line x1={pad} y1={pad + f * (H - 2 * pad)} x2={W - pad} y2={pad + f * (H - 2 * pad)} />
+        </g>
+      ))}
       {q &&
         hi.map((p) => (
           <line key={`l${p.c.id}`} x1={q.px} y1={q.py} x2={p.px} y2={p.py} stroke="var(--color-primary)" strokeWidth="1.25" strokeDasharray="3 3" opacity="0.55" />
@@ -226,17 +259,22 @@ function Scatter({ highlightIds = [], queryText }: { highlightIds?: number[]; qu
             fill={docColor(p.c.docId).dot}
             stroke={hl.has(p.c.id) ? 'var(--color-ink)' : 'transparent'}
             strokeWidth={hl.has(p.c.id) ? 2 : 0}
-            opacity={active ? 1 : 0.3}
-          />
+            opacity={active ? 1 : 0.28}
+            style={{ transition: ptTransition, cursor: 'pointer' }}
+          >
+            <title>
+              Doc {p.c.docId} · {p.c.docTitle}: {p.c.text}
+            </title>
+          </circle>
         )
       })}
       {q && (
-        <>
-          <circle cx={q.px} cy={q.py} r="8.5" fill="var(--color-primary)" stroke="var(--color-bg)" strokeWidth="2" />
+        <g style={{ transition: 'transform .45s ease' }}>
+          <circle cx={q.px} cy={q.py} r="8.5" fill="var(--color-primary)" stroke="var(--color-bg)" strokeWidth="2" style={{ transition: ptTransition }} />
           <text x={q.px} y={q.py - 13} textAnchor="middle" fontSize="11" fontWeight="700" fill="var(--color-ink)">
             query
           </text>
-        </>
+        </g>
       )}
     </svg>
   )
@@ -262,20 +300,16 @@ function Legend() {
 function Hero() {
   return (
     <section className="relative overflow-hidden">
-      <div className="pointer-events-none absolute inset-0 -z-10">
-        <div
-          className="absolute left-1/2 top-[-14%] h-[440px] w-[860px] max-w-[140vw] -translate-x-1/2 rounded-full opacity-60 blur-3xl"
-          style={{ background: 'radial-gradient(closest-side, var(--color-primary-soft), transparent)' }}
-        />
+      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        <div className="ee-aurora-blob absolute left-[12%] top-[-12%] h-[440px] w-[540px] rounded-full opacity-40 blur-3xl" style={{ background: 'radial-gradient(closest-side, var(--color-primary), transparent)' }} />
+        <div className="ee-aurora-blob absolute right-[8%] top-[0%] h-[400px] w-[480px] rounded-full opacity-30 blur-3xl" style={{ background: 'radial-gradient(closest-side, var(--color-accent), transparent)', animationDelay: '-6s' }} />
+        <div className="ee-aurora-blob absolute left-[34%] top-[16%] h-[380px] w-[480px] rounded-full opacity-25 blur-3xl" style={{ background: 'radial-gradient(closest-side, var(--color-accent2), transparent)', animationDelay: '-12s' }} />
       </div>
-      <div className="mx-auto max-w-3xl px-6 pb-16 pt-20 text-center">
-        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.2em] text-primary">
-          Explorable Explainer · Retrieval-Augmented Generation
-        </p>
-        <h1 className="font-display text-5xl leading-[1.04] tracking-tight text-ink sm:text-6xl">How RAG Actually Works</h1>
-        <p className="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-muted">
-          Language models are fluent, confident — and sometimes completely wrong. Scroll to see, piece by piece, how{' '}
-          <em>retrieval</em> turns a guessing machine into one that answers from real sources.
+      <div className="mx-auto max-w-3xl px-6 pb-16 pt-24 text-center sm:pt-28">
+        <p className="mb-5 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Explorable Explainer · Retrieval-Augmented Generation</p>
+        <h1 className="font-display text-6xl font-medium leading-[1.0] tracking-[-0.02em] text-ink sm:text-7xl">How RAG Actually Works</h1>
+        <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-muted sm:text-xl">
+          Language models are fluent, confident — and sometimes completely wrong. Scroll to see, piece by piece, how <em>retrieval</em> turns a guessing machine into one that answers from real sources.
         </p>
         <div className="mt-8 flex items-center justify-center gap-3 text-sm text-faint">
           <span>
@@ -284,7 +318,7 @@ function Hero() {
           <span aria-hidden>·</span>
           <span>@codezorana</span>
         </div>
-        <div className="mt-14 flex justify-center text-faint">
+        <div className="mt-16 flex justify-center text-faint">
           <span className="animate-bounce">↓</span>
         </div>
       </div>
@@ -293,9 +327,7 @@ function Hero() {
 }
 
 const tab = (active: boolean) =>
-  `rounded-md px-4 py-1.5 font-medium transition ${
-    active ? 'bg-surface text-ink shadow-sm ring-1 ring-line' : 'text-muted hover:text-ink'
-  }`
+  `rounded-md px-4 py-1.5 font-medium transition ${active ? 'bg-surface text-ink shadow-sm ring-1 ring-line' : 'text-muted hover:text-ink'}`
 
 function ProblemWidget() {
   const [mode, setMode] = useState<Mode>('llm')
@@ -303,9 +335,7 @@ function ProblemWidget() {
     <Card className="mt-8">
       <div className="mb-5 flex items-start gap-3">
         <span className="mt-0.5 shrink-0 rounded-md bg-primary-soft px-2 py-1 text-xs font-semibold text-primary-ink">Q</span>
-        <p className="text-base font-medium text-ink">
-          What is the capital of the Marenne Islands, and roughly how many people live there?
-        </p>
+        <p className="text-base font-medium text-ink">What is the capital of the Marenne Islands, and roughly how many people live there?</p>
       </div>
 
       <div className="mb-6 inline-flex rounded-lg border border-line bg-bg p-1 text-sm">
@@ -323,13 +353,10 @@ function ProblemWidget() {
             <Tag tone="bad">Unverified · 0 sources</Tag>
           </div>
           <p className="text-lg leading-relaxed text-ink">
-            The capital of the Marenne Islands is <span className="font-semibold">Marenne City</span>, a coastal hub of
-            roughly <span className="font-semibold">250,000</span> people.
+            The capital of the Marenne Islands is <span className="font-semibold">Marenne City</span>, a coastal hub of roughly <span className="font-semibold">250,000</span> people.
           </p>
           <p className="mt-4 rounded-lg bg-bad-soft px-4 py-3 text-sm leading-relaxed text-ink/80">
-            <span className="font-semibold text-bad">The catch:</span> fluent, confident — and entirely invented. The
-            model has no knowledge of the (fictional) Marenne Islands, so it fills the gap with plausible fiction. You
-            can't tell which words to trust.
+            <span className="font-semibold text-bad">The catch:</span> fluent, confident — and entirely invented. The model has no knowledge of the (fictional) Marenne Islands, so it fills the gap with plausible fiction. You can't tell which words to trust.
           </p>
         </div>
       ) : (
@@ -344,8 +371,7 @@ function ProblemWidget() {
             <Cite n={2} />.
           </p>
           <p className="mt-4 rounded-lg bg-good-soft px-4 py-3 text-sm leading-relaxed text-ink/80">
-            <span className="font-semibold text-good">The difference:</span> same model, but it now answers only from
-            retrieved documents — and every claim carries a citation you can check.
+            <span className="font-semibold text-good">The difference:</span> same model, but it now answers only from retrieved documents — and every claim carries a citation you can check.
           </p>
         </div>
       )}
@@ -355,30 +381,29 @@ function ProblemWidget() {
 
 function ProblemSection() {
   return (
-    <section className="mx-auto max-w-3xl px-6 py-16">
-      <SectionLabel n="01" title="The problem" />
-      <H2>A model that never says “I don't know”</H2>
-      <Lede>
-        Ask a language model about something it was never taught, and it rarely hesitates — it produces a fluent,
-        authoritative answer, even if it has to invent one. Here is the same question answered two ways. Flip between
-        them.
-      </Lede>
-      <ProblemWidget />
+    <section id="problem" className="mx-auto max-w-3xl px-6 py-16 sm:py-20">
+      <Reveal>
+        <SectionLabel n="01" title="The problem" />
+        <H2>A model that never says “I don't know”</H2>
+        <Lede>
+          Ask a language model about something it was never taught, and it rarely hesitates — it produces a fluent, authoritative answer, even if it has to invent one. Here is the same question answered two ways. Flip between them.
+        </Lede>
+        <ProblemWidget />
+      </Reveal>
     </section>
   )
 }
 
 function CorpusSection() {
   return (
-    <Section n="02" title="The knowledge base">
+    <Section id="corpus" n="02" title="The knowledge base">
       <H2>Give the model something true to read</H2>
       <Lede>
-        RAG starts with a <em>corpus</em>: a set of trusted documents. Our world here is a tiny field guide to the
-        (made-up) Marenne Islands — five short entries the model may quote from, and nothing else.
+        RAG starts with a <em>corpus</em>: a set of trusted documents. Our world here is a tiny field guide to the (made-up) Marenne Islands — five short entries the model may quote from, and nothing else.
       </Lede>
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         {CORPUS.map((d) => (
-          <div key={d.id} className="rounded-xl border border-line bg-surface p-4 shadow-sm">
+          <div key={d.id} className="rounded-xl border border-line bg-surface p-4 shadow-sm transition duration-300 hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-md">
             <div className="mb-1.5 flex items-center gap-2">
               <span className="h-2 w-2 rounded-full" style={{ background: docColor(d.id).dot }} />
               <span className="text-xs font-semibold uppercase tracking-wide text-muted">
@@ -404,11 +429,10 @@ function ChunkingSection() {
         ? 'Large chunks keep context intact, but each carries extra, unrelated text — that noise can crowd out the part that actually answers the question.'
         : 'A balanced chunk: big enough to hold a complete idea, small enough to stay on-topic when it is retrieved.'
   return (
-    <Section n="03" title="Chunking">
+    <Section id="chunking" n="03" title="Chunking">
       <H2>Cut the documents into searchable pieces</H2>
       <Lede>
-        Before anything can be retrieved, each document is sliced into <em>chunks</em>. How big to cut them is a real
-        design decision — drag the sliders and watch the pieces change.
+        Before anything can be retrieved, each document is sliced into <em>chunks</em>. How big to cut them is a real design decision — drag the sliders and watch the pieces change.
       </Lede>
       <Card className="mt-8">
         <div className="grid gap-6 sm:grid-cols-2">
@@ -416,14 +440,13 @@ function ChunkingSection() {
           <Slider label="Overlap" value={overlap} min={0} max={8} unit="words" onChange={setOverlap} />
         </div>
         <div className="mb-4 mt-6 text-sm text-muted">
-          <span className="tabular-nums font-semibold text-ink">{chunks.length}</span> chunks from {CORPUS.length}{' '}
-          documents
+          <span className="tabular-nums font-semibold text-ink">{chunks.length}</span> chunks from {CORPUS.length} documents
         </div>
         <div className="flex flex-col gap-2">
           {chunks.map((c) => (
             <div
               key={c.id}
-              className="rounded-md border border-line bg-bg px-3 py-2 text-sm text-ink/90"
+              className="rounded-md border border-line bg-bg px-3 py-2 text-sm text-ink/90 transition"
               style={{ borderLeft: `3px solid ${docColor(c.docId).border}` }}
             >
               {c.text}
@@ -438,11 +461,10 @@ function ChunkingSection() {
 
 function EmbeddingsSection() {
   return (
-    <Section n="04" title="Embeddings">
+    <Section id="embeddings" n="04" title="Embeddings">
       <H2>Turn text into points in space</H2>
       <Lede>
-        Each chunk becomes a vector — a list of numbers — positioned so passages about the same thing land near each
-        other. Here are our chunks projected onto a 2D map (a flattened shadow of a much higher-dimensional space).
+        Each chunk becomes a vector — a list of numbers — positioned so passages about the same thing land near each other. Here are our chunks projected onto a 2D map (a flattened shadow of a much higher-dimensional space). Hover a point to read its passage.
       </Lede>
       <Card className="mt-8">
         <Scatter />
@@ -454,9 +476,7 @@ function EmbeddingsSection() {
 
 function queryChip(active: boolean) {
   return `rounded-full border px-3 py-1.5 text-sm transition ${
-    active
-      ? 'border-primary bg-primary-soft text-primary-ink'
-      : 'border-line bg-surface text-muted hover:border-primary/50 hover:text-ink'
+    active ? 'border-primary bg-primary-soft text-primary-ink' : 'border-line bg-surface text-muted hover:border-primary/50 hover:text-ink'
   }`
 }
 
@@ -474,11 +494,10 @@ function RetrievalLab() {
 
   return (
     <>
-      <Section n="05" title="Retrieval">
+      <Section id="retrieval" n="05" title="Retrieval">
         <H2>Find the few passages that matter</H2>
         <Lede>
-          Pick a question. Every passage is scored by similarity to it, and the highest scorers are pulled out as
-          context. Slide <em>top-k</em> to grab more or fewer.
+          Pick a question. Every passage is scored by similarity to it, and the highest scorers are pulled out as context. Slide <em>top-k</em> to grab more or fewer.
         </Lede>
         <Card className="mt-8">
           <div className="mb-5 flex flex-wrap gap-2">
@@ -497,10 +516,7 @@ function RetrievalLab() {
           <div className="grid gap-6 lg:grid-cols-2">
             <div>
               <Scatter highlightIds={topIds} queryText={query.text} />
-              <p className="mt-2 text-xs text-faint">
-                The query lands among the passages it retrieved. 2D is approximate — the actual ranking uses the full
-                vectors.
-              </p>
+              <p className="mt-2 text-xs text-faint">The query lands among the passages it retrieved. 2D is approximate — the actual ranking uses the full vectors.</p>
             </div>
             <div className="flex flex-col gap-2">
               {ranked.map((r) => {
@@ -508,9 +524,7 @@ function RetrievalLab() {
                 return (
                   <div
                     key={r.chunk.id}
-                    className={`rounded-lg border px-3 py-2 transition ${
-                      picked ? 'border-primary/60 bg-primary-soft/40' : 'border-line bg-bg opacity-70'
-                    }`}
+                    className={`rounded-lg border px-3 py-2 transition duration-300 ${picked ? 'border-primary/60 bg-primary-soft/40' : 'border-line bg-bg opacity-70'}`}
                   >
                     <div className="flex items-center justify-between gap-2">
                       <span className="flex items-center gap-1.5 text-xs font-medium text-muted">
@@ -520,7 +534,7 @@ function RetrievalLab() {
                       <span className="tabular-nums text-xs text-faint">{r.score.toFixed(2)}</span>
                     </div>
                     <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-line">
-                      <div className="h-full rounded-full bg-primary" style={{ width: `${(r.score / maxScore) * 100}%` }} />
+                      <div className="h-full rounded-full transition-[width] duration-500 ease-out" style={{ width: `${(r.score / maxScore) * 100}%`, background: 'linear-gradient(90deg, var(--color-primary), var(--color-accent))' }} />
                     </div>
                     <p className="mt-1.5 line-clamp-2 text-sm text-ink/85">{r.chunk.text}</p>
                   </div>
@@ -531,11 +545,10 @@ function RetrievalLab() {
         </Card>
       </Section>
 
-      <Section n="06" title="Generation">
+      <Section id="generation" n="06" title="Generation">
         <H2>Answer only from what was retrieved</H2>
         <Lede>
-          The retrieved passages are pasted into the prompt as context. The model must answer from them — and cite
-          them. If the answer isn't there, a trustworthy system says so.
+          The retrieved passages are pasted into the prompt as context. The model must answer from them — and cite them. If the answer isn't there, a trustworthy system says so.
         </Lede>
         <Card className="mt-8">
           <div className="rounded-lg border border-line bg-bg p-4 font-mono text-[13px] leading-relaxed text-ink/85">
@@ -564,12 +577,11 @@ function RetrievalLab() {
                 </div>
                 <p className="text-lg leading-relaxed text-ink">
                   {query.outOfScope
-                    ? 'I can\'t find that in the knowledge base. None of the retrieved passages mention it — so the honest answer is that this isn\'t covered, rather than a guess.'
-                    : 'The passage needed to answer this wasn\'t retrieved. Increase top-k so the model actually has the source in front of it.'}
+                    ? "I can't find that in the knowledge base. None of the retrieved passages mention it — so the honest answer is that this isn't covered, rather than a guess."
+                    : "The passage needed to answer this wasn't retrieved. Increase top-k so the model actually has the source in front of it."}
                 </p>
                 <p className="mt-4 rounded-lg bg-good-soft px-4 py-3 text-sm leading-relaxed text-ink/80">
-                  <span className="font-semibold text-good">This is the point:</span> grounding means the system can
-                  decline. A model that only answers from sources can admit when there are none.
+                  <span className="font-semibold text-good">This is the point:</span> grounding means the system can decline. A model that only answers from sources can admit when there are none.
                 </p>
               </>
             )}
@@ -583,18 +595,15 @@ function RetrievalLab() {
 function RecapSection() {
   const steps = ['Corpus', 'Chunk', 'Embed', 'Retrieve', 'Augment', 'Generate']
   return (
-    <Section n="07" title="The whole loop">
+    <Section id="recap" n="07" title="The whole loop">
       <H2>From a guess to a grounded answer</H2>
       <Lede>
-        That's RAG end to end: cut trusted documents into chunks, embed them, retrieve the few that match the question,
-        paste them into the prompt, and generate an answer that cites — or honestly declines.
+        That's RAG end to end: cut trusted documents into chunks, embed them, retrieve the few that match the question, paste them into the prompt, and generate an answer that cites — or honestly declines.
       </Lede>
       <div className="mt-8 flex flex-wrap items-center gap-2">
         {steps.map((s, i) => (
           <span key={s} className="flex items-center gap-2">
-            <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink shadow-sm">
-              {s}
-            </span>
+            <span className="rounded-full border border-line bg-surface px-3 py-1.5 text-sm font-medium text-ink shadow-sm transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">{s}</span>
             {i < steps.length - 1 && <span className="text-faint">→</span>}
           </span>
         ))}
@@ -608,8 +617,7 @@ function Footer() {
     <footer className="mx-auto mt-8 max-w-3xl border-t border-line px-6 py-16 text-center text-sm text-faint">
       <p>Part of a series of explorable explainers on how AI actually works. ✦</p>
       <p className="mt-2">
-        Built by <span className="text-muted">Laela Zorana</span> · @codezorana · runs entirely in your browser, no API
-        keys
+        Built by <span className="text-muted">Laela Zorana</span> · @codezorana · runs entirely in your browser, no API keys
       </p>
     </footer>
   )
