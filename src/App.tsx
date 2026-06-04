@@ -297,6 +297,60 @@ function Legend() {
 /* Sections                                                            */
 /* ------------------------------------------------------------------ */
 
+function RAGFlow() {
+  const nodes = [
+    { x: 8, label: 'Question' },
+    { x: 190, label: 'Retrieve' },
+    { x: 372, label: 'Generate' },
+    { x: 554, label: 'Answer' },
+  ]
+  const W = 136
+  const cy = 65
+  const segs = ['M144 65 L190 65', 'M326 65 L372 65', 'M508 65 L554 65']
+  return (
+    <svg viewBox="0 0 700 130" className="h-auto w-full select-none" role="img" aria-label="The RAG pipeline: question, retrieve, generate, answer">
+      <defs>
+        {segs.map((d, i) => (
+          <path key={i} id={`ee-seg${i}`} d={d} fill="none" />
+        ))}
+      </defs>
+      {segs.map((d, i) => (
+        <path key={`c${i}`} d={d} stroke="var(--color-line)" strokeWidth="2" fill="none" />
+      ))}
+      {nodes.map((n, i) => {
+        const answer = i === nodes.length - 1
+        return (
+          <g key={n.label}>
+            <rect
+              x={n.x}
+              y={cy - 23}
+              width={W}
+              height={46}
+              rx={12}
+              fill="var(--color-surface)"
+              stroke={answer ? 'var(--color-primary)' : 'var(--color-line)'}
+              strokeWidth={answer ? 2 : 1.25}
+              className={answer ? 'ee-pulse-node' : undefined}
+            />
+            <text x={n.x + W / 2} y={cy} textAnchor="middle" dominantBaseline="central" fontSize="14" fontWeight="600" fill="var(--color-ink)" fontFamily="var(--font-sans)">
+              {n.label}
+            </text>
+          </g>
+        )
+      })}
+      {segs.map((_, i) =>
+        [0, 0.75].map((o, j) => (
+          <circle key={`d${i}-${j}`} r="3.5" fill={j ? 'var(--color-accent)' : 'var(--color-primary)'}>
+            <animateMotion dur="1.5s" repeatCount="indefinite" begin={`${i * 0.5 + o}s`}>
+              <mpath href={`#ee-seg${i}`} />
+            </animateMotion>
+          </circle>
+        )),
+      )}
+    </svg>
+  )
+}
+
 function Hero() {
   return (
     <section className="relative overflow-hidden">
@@ -318,7 +372,11 @@ function Hero() {
           <span aria-hidden>·</span>
           <span>@codezorana</span>
         </div>
-        <div className="mt-16 flex justify-center text-faint">
+        <div className="mx-auto mt-14 max-w-xl">
+          <RAGFlow />
+          <p className="mt-3 text-center text-[0.7rem] font-semibold uppercase tracking-[0.18em] text-faint">the pipeline, in four steps</p>
+        </div>
+        <div className="mt-12 flex justify-center text-faint">
           <span className="animate-bounce">↓</span>
         </div>
       </div>
@@ -625,11 +683,51 @@ function Footer() {
 
 /* ------------------------------------------------------------------ */
 
+const SECTIONS = [
+  { id: 'problem', label: 'The problem' },
+  { id: 'corpus', label: 'Knowledge base' },
+  { id: 'chunking', label: 'Chunking' },
+  { id: 'embeddings', label: 'Embeddings' },
+  { id: 'retrieval', label: 'Retrieval' },
+  { id: 'generation', label: 'Generation' },
+  { id: 'recap', label: 'The loop' },
+]
+
+function SideNav() {
+  const [active, setActive] = useState('problem')
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      (entries) => entries.forEach((e) => { if (e.isIntersecting) setActive(e.target.id) }),
+      { rootMargin: '-45% 0px -45% 0px' },
+    )
+    SECTIONS.forEach((s) => {
+      const el = document.getElementById(s.id)
+      if (el) obs.observe(el)
+    })
+    return () => obs.disconnect()
+  }, [])
+  return (
+    <nav className="fixed right-6 top-1/2 z-40 hidden -translate-y-1/2 lg:block">
+      <ul className="flex flex-col gap-3">
+        {SECTIONS.map((s) => (
+          <li key={s.id}>
+            <a href={`#${s.id}`} className="group flex items-center justify-end gap-2" aria-label={s.label}>
+              <span className={`text-xs transition-opacity ${active === s.id ? 'text-ink opacity-100' : 'text-faint opacity-0 group-hover:opacity-100'}`}>{s.label}</span>
+              <span className={`h-2 w-2 rounded-full border transition ${active === s.id ? 'scale-125 border-primary bg-primary' : 'border-line group-hover:border-primary'}`} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
 export default function App() {
   const { dark, setDark } = useDarkMode()
   return (
     <>
       <ScrollProgress />
+      <SideNav />
       <TopBar dark={dark} setDark={setDark} />
       <main>
         <Hero />

@@ -141,6 +141,19 @@ input[type='range'].ee-range::-moz-range-thumb {
   transform: none;
 }
 
+@keyframes ee-pulse {
+  0%,
+  100% {
+    stroke-opacity: 1;
+  }
+  50% {
+    stroke-opacity: 0.35;
+  }
+}
+.ee-pulse-node {
+  animation: ee-pulse 2.4s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -151,6 +164,9 @@ input[type='range'].ee-range::-moz-range-thumb {
     transition: none;
   }
   .ee-aurora-blob {
+    animation: none !important;
+  }
+  .ee-pulse-node {
     animation: none !important;
   }
 }
