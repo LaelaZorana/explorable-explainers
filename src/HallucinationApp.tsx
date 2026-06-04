@@ -156,7 +156,7 @@ export default function HallucinationApp() {
     <div className="accent-cobalt">
       <ScrollProgress />
       <SideNav sections={SECTIONS} />
-      <TopBar series="Hallucination" dark={dark} setDark={setDark} />
+      <TopBar series="Hallucination" home="../" dark={dark} setDark={setDark} />
       <main>
         <Hero />
 
@@ -212,7 +212,7 @@ export default function HallucinationApp() {
           </Lede>
         </Section>
       </main>
-      <SeriesFooter more={{ href: './', label: 'How RAG Actually Works' }} />
+      <SeriesFooter more={{ href: '../verifier/', label: 'How a Verifier Works' }} />
     </div>
   )
 }

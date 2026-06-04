@@ -491,7 +491,7 @@ export default function App() {
     <>
       <ScrollProgress />
       <SideNav sections={SECTIONS} />
-      <TopBar series="RAG" dark={dark} setDark={setDark} />
+      <TopBar series="RAG" home="../" dark={dark} setDark={setDark} />
       <main>
         <Hero />
         <ProblemSection />
@@ -501,7 +501,7 @@ export default function App() {
         <RetrievalLab />
         <RecapSection />
       </main>
-      <SeriesFooter more={{ href: './hallucination.html', label: 'Why LLMs Hallucinate' }} />
+      <SeriesFooter more={{ href: '../hallucination/', label: 'Why LLMs Hallucinate' }} />
     </>
   )
 }

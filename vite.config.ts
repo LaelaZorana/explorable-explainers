@@ -11,8 +11,10 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        main: resolve(import.meta.dirname, 'index.html'),
-        hallucination: resolve(import.meta.dirname, 'hallucination.html'),
+        landing: resolve(import.meta.dirname, 'index.html'),
+        rag: resolve(import.meta.dirname, 'rag/index.html'),
+        hallucination: resolve(import.meta.dirname, 'hallucination/index.html'),
+        verifier: resolve(import.meta.dirname, 'verifier/index.html'),
       },
     },
   },

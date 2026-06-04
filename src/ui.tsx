@@ -85,14 +85,14 @@ export function ScrollProgress() {
   )
 }
 
-export function TopBar({ series, dark, setDark }: { series: string; dark: boolean; setDark: (v: boolean) => void }) {
+export function TopBar({ series, home = './', dark, setDark }: { series?: string; home?: string; dark: boolean; setDark: (v: boolean) => void }) {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-bg/80 backdrop-blur-md">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
-        <a href="./" className="flex items-center gap-2">
+        <a href={home} className="flex items-center gap-2">
           <span className="text-primary">✦</span>
           <span className="font-mono text-xs uppercase tracking-[0.12em] text-ink">Explorable Explainers</span>
-          <span className="font-mono text-xs text-faint">/ {series}</span>
+          {series && <span className="font-mono text-xs text-faint">/ {series}</span>}
         </a>
         <button
           onClick={() => setDark(!dark)}
