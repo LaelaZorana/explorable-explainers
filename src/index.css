@@ -51,6 +51,18 @@
   --color-amber: #e0a43a;
 }
 
+/* Per-page accent overrides — the family varies the single signal colour */
+.accent-cobalt {
+  --color-primary: #2563eb;
+  --color-primary-ink: #1d4ed8;
+  --color-primary-soft: #e7eefc;
+}
+:root.dark .accent-cobalt {
+  --color-primary: #5b9bff;
+  --color-primary-ink: #84b4ff;
+  --color-primary-soft: #14233f;
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;
