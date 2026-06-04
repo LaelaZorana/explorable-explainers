@@ -2,51 +2,53 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* ---- The Lab : Swiss-technical, paper + ink + one signal colour ---- */
 @theme {
-  --color-bg: #faf9f6;
+  --color-bg: #faf9f5; /* paper */
   --color-surface: #ffffff;
   --color-elevated: #ffffff;
-  --color-ink: #1b1a20;
-  --color-muted: #6c6b77;
-  --color-faint: #93919e;
-  --color-line: #e9e7e1;
+  --color-ink: #14130f; /* warm near-black */
+  --color-muted: #5c5a52;
+  --color-faint: #8c8a80;
+  --color-line: #e3e0d6; /* warm hairline */
 
-  --color-primary: #6d5ef0;
-  --color-primary-ink: #4b3fd1;
-  --color-primary-soft: #efedfd;
-  --color-accent: #ec4f7c;
-  --color-accent2: #34b6e4;
+  --color-primary: #ff4d00; /* signal orange — the one accent */
+  --color-primary-ink: #d63e00; /* readable orange on paper */
+  --color-primary-soft: #ffe9df;
+  --color-accent: #1f6feb; /* cobalt — used sparingly for data only */
+  --color-accent2: #ff4d00;
 
-  --color-good: #0ea371;
-  --color-good-soft: #e6f6ef;
-  --color-bad: #e0544f;
-  --color-bad-soft: #fcebea;
-  --color-amber: #d98a09;
+  --color-good: #0f7a4f;
+  --color-good-soft: #e4f3ec;
+  --color-bad: #c43b22;
+  --color-bad-soft: #fbe9e3;
+  --color-amber: #b5740a;
 
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-  --font-display: "Fraunces Variable", Georgia, "Times New Roman", ui-serif, serif;
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: "Geist Mono Variable", ui-monospace, "SF Mono", "JetBrains Mono", Menlo, Consolas, monospace;
+  --font-display: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
 }
 
 :root.dark {
-  --color-bg: #0c0b11;
-  --color-surface: #16151e;
-  --color-elevated: #1c1a26;
-  --color-ink: #ededf2;
-  --color-muted: #a3a1b0;
-  --color-faint: #6f6d7e;
-  --color-line: #29262f;
+  --color-bg: #0d0c0a;
+  --color-surface: #15140f;
+  --color-elevated: #1a1813;
+  --color-ink: #f1efe7;
+  --color-muted: #a4a298;
+  --color-faint: #6f6d63;
+  --color-line: #2a2820;
 
-  --color-primary: #8d7dff;
-  --color-primary-ink: #b9adff;
-  --color-primary-soft: #211d39;
-  --color-accent: #f56f99;
-  --color-accent2: #4cc4ec;
+  --color-primary: #ff5c1a;
+  --color-primary-ink: #ff7a44;
+  --color-primary-soft: #2a1810;
+  --color-accent: #5b9bff;
+  --color-accent2: #ff5c1a;
 
   --color-good: #34d399;
-  --color-good-soft: #102a20;
-  --color-bad: #f3756f;
-  --color-bad-soft: #2c1715;
-  --color-amber: #f0a93a;
+  --color-good-soft: #0f2a1f;
+  --color-bad: #f0795f;
+  --color-bad-soft: #2c1611;
+  --color-amber: #e0a43a;
 }
 
 @layer base {
@@ -60,81 +62,66 @@
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-  h1,
-  h2,
-  h3 {
-    font-optical-sizing: auto;
-  }
   ::selection {
-    background: color-mix(in srgb, var(--color-primary) 26%, transparent);
+    background: var(--color-primary);
+    color: #fff;
   }
 }
 
-/* Premium range sliders */
+/* Hairline grid background (hero) */
+.ee-grid-bg {
+  background-image: linear-gradient(var(--color-line) 1px, transparent 1px), linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 46px 46px;
+  -webkit-mask-image: radial-gradient(ellipse 72% 62% at 50% 34%, #000 28%, transparent 76%);
+  mask-image: radial-gradient(ellipse 72% 62% at 50% 34%, #000 28%, transparent 76%);
+}
+
+/* Square, signal-coloured "engineered" range sliders */
 input[type='range'].ee-range {
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 18px;
+  height: 16px;
   background: transparent;
   cursor: pointer;
 }
 input[type='range'].ee-range::-webkit-slider-runnable-track {
-  height: 6px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 35%, var(--color-line)));
+  height: 4px;
+  background: var(--color-line);
 }
 input[type='range'].ee-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 18px;
-  height: 18px;
+  width: 16px;
+  height: 16px;
   margin-top: -6px;
-  border-radius: 999px;
-  background: var(--color-surface);
-  border: 2px solid var(--color-primary);
-  box-shadow: 0 2px 6px rgb(0 0 0 / 0.18);
-  transition: transform 0.12s ease, box-shadow 0.12s ease;
+  background: var(--color-primary);
+  border: none;
+  transition: transform 0.12s ease;
 }
 input[type='range'].ee-range::-webkit-slider-thumb:hover {
   transform: scale(1.18);
-  box-shadow: 0 3px 10px rgb(0 0 0 / 0.25);
 }
 input[type='range'].ee-range::-moz-range-track {
-  height: 6px;
-  border-radius: 999px;
+  height: 4px;
   background: var(--color-line);
 }
 input[type='range'].ee-range::-moz-range-thumb {
-  width: 16px;
-  height: 16px;
-  border-radius: 999px;
-  background: var(--color-surface);
-  border: 2px solid var(--color-primary);
+  width: 14px;
+  height: 14px;
+  border-radius: 0;
+  background: var(--color-primary);
+  border: none;
   cursor: pointer;
 }
 
 /* Motion */
-@keyframes ee-aurora {
-  0% {
-    transform: translate(-8%, -4%) scale(1);
-  }
-  50% {
-    transform: translate(8%, 5%) scale(1.12);
-  }
-  100% {
-    transform: translate(-8%, -4%) scale(1);
-  }
-}
-.ee-aurora-blob {
-  animation: ee-aurora 18s ease-in-out infinite;
-}
 .ee-reveal {
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(14px);
   transition:
-    opacity 0.6s cubic-bezier(0.22, 0.61, 0.36, 1),
-    transform 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+    opacity 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 .ee-reveal.ee-in {
   opacity: 1;
@@ -147,7 +134,7 @@ input[type='range'].ee-range::-moz-range-thumb {
     stroke-opacity: 1;
   }
   50% {
-    stroke-opacity: 0.35;
+    stroke-opacity: 0.3;
   }
 }
 .ee-pulse-node {
@@ -162,9 +149,6 @@ input[type='range'].ee-range::-moz-range-thumb {
     opacity: 1;
     transform: none;
     transition: none;
-  }
-  .ee-aurora-blob {
-    animation: none !important;
   }
   .ee-pulse-node {
     animation: none !important;
