@@ -177,7 +177,7 @@ function Hero() {
           How <span className="text-primary">RAG</span> Actually Works
         </h1>
         <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-muted sm:text-xl">
-          Language models are fluent, confident — and sometimes completely wrong. Scroll to see, piece by piece, how <span className="text-ink">retrieval</span> turns a guessing machine into one that answers from real sources.
+          Language models are fluent, confident, and sometimes completely wrong. Scroll to see, piece by piece, how <span className="text-ink">retrieval</span> turns a guessing machine into one that answers from real sources.
         </p>
         <div className="mt-7 flex items-center justify-center gap-2 font-mono text-xs text-faint">
           <span className="text-muted">Laela Zorana</span>
@@ -186,7 +186,7 @@ function Hero() {
         </div>
         <div className="mx-auto mt-14 max-w-xl">
           <RAGFlow />
-          <p className="mt-4 text-center font-mono text-[0.7rem] uppercase tracking-[0.2em] text-faint">fig. 01 — the pipeline</p>
+          <p className="mt-4 text-center font-mono text-[0.7rem] uppercase tracking-[0.2em] text-faint">fig. 01 · the pipeline</p>
         </div>
         <div className="mt-12 flex justify-center text-faint">
           <span className="animate-bounce">↓</span>
@@ -230,7 +230,7 @@ function ProblemWidget() {
             The capital of the Marenne Islands is <span className="font-semibold">Marenne City</span>, a coastal hub of roughly <span className="font-semibold">250,000</span> people.
           </p>
           <Callout tone="bad">
-            <span className="font-semibold text-bad">The catch:</span> fluent, confident — and entirely invented. The model has no knowledge of the (fictional) Marenne Islands, so it fills the gap with plausible fiction. You can't tell which words to trust.
+            <span className="font-semibold text-bad">The catch:</span> fluent, confident, and entirely invented. The model has no knowledge of the (fictional) Marenne Islands, so it fills the gap with plausible fiction. You can't tell which words to trust.
           </Callout>
         </div>
       ) : (
@@ -245,7 +245,7 @@ function ProblemWidget() {
             <Cite n={2} />.
           </p>
           <Callout tone="good">
-            <span className="font-semibold text-good">The difference:</span> same model, but it now answers only from retrieved documents — and every claim carries a citation you can check.
+            <span className="font-semibold text-good">The difference:</span> same model, but it now answers only from retrieved documents, and every claim carries a citation you can check.
           </Callout>
         </div>
       )}
@@ -260,7 +260,7 @@ function ProblemSection() {
         <SectionLabel n="01" title="The problem" />
         <H2>A model that never says “I don't know”</H2>
         <Lede>
-          Ask a language model about something it was never taught, and it rarely hesitates — it produces a fluent, authoritative answer, even if it has to invent one. Here is the same question answered two ways. Flip between them.
+          Ask a language model about something it was never taught, and it rarely hesitates. It produces a fluent, authoritative answer, even if it has to invent one. Here is the same question answered two ways. Flip between them.
         </Lede>
         <ProblemWidget />
       </Reveal>
@@ -273,7 +273,7 @@ function CorpusSection() {
     <Section id="corpus" n="02" title="The knowledge base">
       <H2>Give the model something true to read</H2>
       <Lede>
-        RAG starts with a <span className="text-ink">corpus</span>: a set of trusted documents. Our world here is a tiny field guide to the (made-up) Marenne Islands — five short entries the model may quote from, and nothing else.
+        RAG starts with a <span className="text-ink">corpus</span>: a set of trusted documents. Our world here is a tiny field guide to the (made-up) Marenne Islands: five short entries the model may quote from, and nothing else.
       </Lede>
       <div className="mt-8 grid gap-3 sm:grid-cols-2">
         {CORPUS.map((d) => (
@@ -296,15 +296,15 @@ function ChunkingSection() {
   const chunks = useMemo(() => chunkDocs(CORPUS, size, overlap), [size, overlap])
   const note =
     size <= 6
-      ? 'Tiny chunks are precise to search, but each loses its surrounding context — answering may need two or three stitched together.'
+      ? 'Tiny chunks are precise to search, but each loses its surrounding context, so answering may need two or three stitched together.'
       : size >= 22
-        ? 'Large chunks keep context intact, but each carries extra, unrelated text — that noise can crowd out the part that actually answers the question.'
+        ? 'Large chunks keep context intact, but each carries extra, unrelated text, and that noise can crowd out the part that actually answers the question.'
         : 'A balanced chunk: big enough to hold a complete idea, small enough to stay on-topic when it is retrieved.'
   return (
     <Section id="chunking" n="03" title="Chunking">
       <H2>Cut the documents into searchable pieces</H2>
       <Lede>
-        Before anything can be retrieved, each document is sliced into <span className="text-ink">chunks</span>. How big to cut them is a real design decision — drag the sliders and watch the pieces change.
+        Before anything can be retrieved, each document is sliced into <span className="text-ink">chunks</span>. How big to cut them is a real design decision. Drag the sliders and watch the pieces change.
       </Lede>
       <Card className="mt-8">
         <div className="grid gap-6 sm:grid-cols-2">
@@ -332,7 +332,7 @@ function EmbeddingsSection() {
     <Section id="embeddings" n="04" title="Embeddings">
       <H2>Turn text into points in space</H2>
       <Lede>
-        Each chunk becomes a vector — a list of numbers — positioned so passages about the same thing land near each other. Here are our chunks projected onto a 2D map (a flattened shadow of a much higher-dimensional space). Hover a point to read its passage.
+        Each chunk becomes a vector, a list of numbers, positioned so passages about the same thing land near each other. Here are our chunks projected onto a 2D map (a flattened shadow of a much higher-dimensional space). Hover a point to read its passage.
       </Lede>
       <Card className="mt-8">
         <Scatter />
@@ -382,7 +382,7 @@ function RetrievalLab() {
           <div className="grid gap-6 lg:grid-cols-2">
             <div>
               <Scatter highlightIds={topIds} queryText={query.text} />
-              <p className="mt-2 font-mono text-[0.7rem] text-faint">// query lands among its retrieved passages. 2D is approximate; ranking uses the full vectors.</p>
+              <p className="mt-2 font-mono text-[0.7rem] text-faint">// query sits among its retrieved passages. 2D is approximate; ranking uses the full vectors.</p>
             </div>
             <div className="flex flex-col gap-2">
               {ranked.map((r) => {
@@ -411,7 +411,7 @@ function RetrievalLab() {
       <Section id="generation" n="06" title="Generation">
         <H2>Answer only from what was retrieved</H2>
         <Lede>
-          The retrieved passages are pasted into the prompt as context. The model must answer from them — and cite them. If the answer isn't there, a trustworthy system says so.
+          The retrieved passages are pasted into the prompt as context. The model must answer from them, and cite them. If the answer isn't there, a trustworthy system says so.
         </Lede>
         <Card className="mt-8">
           <div className="border border-line bg-bg p-4 font-mono text-[13px] leading-relaxed text-ink/85">
@@ -440,7 +440,7 @@ function RetrievalLab() {
                 </div>
                 <p className="text-lg leading-relaxed text-ink">
                   {query.outOfScope
-                    ? "I can't find that in the knowledge base. None of the retrieved passages mention it — so the honest answer is that this isn't covered, rather than a guess."
+                    ? "I can't find that in the knowledge base. None of the retrieved passages mention it, so the honest answer is that this isn't covered, rather than a guess."
                     : "The passage needed to answer this wasn't retrieved. Increase top-k so the model actually has the source in front of it."}
                 </p>
                 <Callout tone="good">
@@ -461,7 +461,7 @@ function RecapSection() {
     <Section id="recap" n="07" title="The whole loop">
       <H2>From a guess to a grounded answer</H2>
       <Lede>
-        That's RAG end to end: cut trusted documents into chunks, embed them, retrieve the few that match the question, paste them into the prompt, and generate an answer that cites — or honestly declines.
+        That's RAG end to end: cut trusted documents into chunks, embed them, retrieve the few that match the question, paste them into the prompt, and generate an answer that cites, or honestly declines.
       </Lede>
       <div className="mt-8 flex flex-wrap items-center gap-2">
         {steps.map((s, i) => (

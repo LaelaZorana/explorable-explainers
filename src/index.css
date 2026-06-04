@@ -12,10 +12,10 @@
   --color-faint: #8c8a80;
   --color-line: #e3e0d6; /* warm hairline */
 
-  --color-primary: #ff4d00; /* signal orange — the one accent */
+  --color-primary: #ff4d00; /* signal orange, the one accent */
   --color-primary-ink: #d63e00; /* readable orange on paper */
   --color-primary-soft: #ffe9df;
-  --color-accent: #1f6feb; /* cobalt — used sparingly for data only */
+  --color-accent: #1f6feb; /* cobalt, used sparingly for data only */
   --color-accent2: #ff4d00;
 
   --color-good: #0f7a4f;
@@ -51,7 +51,7 @@
   --color-amber: #e0a43a;
 }
 
-/* Per-page accent overrides — the family varies the single signal colour */
+/* Per-page accent overrides; the family varies the single signal colour */
 .accent-cobalt {
   --color-primary: #2563eb;
   --color-primary-ink: #1d4ed8;

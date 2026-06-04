@@ -120,7 +120,7 @@ function Hero() {
           Why LLMs <span className="text-primary">Hallucinate</span>
         </h1>
         <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-muted sm:text-xl">
-          A language model doesn't look facts up — it predicts the next word. Watch, token by token, how that one mechanism produces both brilliant answers and confident nonsense.
+          A language model doesn't look facts up. It predicts the next word. Watch, token by token, how that one mechanism produces both brilliant answers and confident nonsense.
         </p>
         <div className="mt-7 flex items-center justify-center gap-2 font-mono text-xs text-faint">
           <span className="text-muted">Laela Zorana</span>
@@ -165,7 +165,7 @@ export default function HallucinationApp() {
             <SectionLabel n="01" title="The problem" />
             <H2>Fluent, confident, and sometimes made up</H2>
             <Lede>
-              An LLM generates text one token at a time, always choosing something plausible. It has no separate "do I actually know this?" check — so when it doesn't know, it doesn't stop. It guesses, in the exact same confident voice it uses for facts.
+              An LLM generates text one token at a time, always choosing something plausible. It has no separate "do I actually know this?" check, so when it doesn't know, it doesn't stop. It guesses, in the exact same confident voice it uses for facts.
             </Lede>
           </Reveal>
         </section>
@@ -173,7 +173,7 @@ export default function HallucinationApp() {
         <Section id="mechanism" n="02" title="Next-token prediction">
           <H2>It's a probability machine</H2>
           <Lede>
-            At each step the model ranks possible next tokens by probability and commits to the top one. Step through it — and switch between a fact it knows and one it doesn't. Watch the distribution go flat exactly when it starts making things up.
+            At each step the model ranks possible next tokens by probability and commits to the top one. Step through it, and switch between a fact it knows and one it doesn't. Watch the distribution go flat exactly when it starts making things up.
           </Lede>
           <TokenPredictor />
         </Section>
@@ -181,7 +181,7 @@ export default function HallucinationApp() {
         <Section id="confidence" n="03" title="Confidence ≠ truth">
           <H2>The model can't feel its own ignorance</H2>
           <Lede>
-            Look at the "top %" readout while you step. For the made-up place it's lower — the model is genuinely <span className="text-ink">less sure</span> — but it still commits, and nothing downstream sees that doubt. The fabricated answer arrives in the same authoritative tone as the real one. High probability is not the same as being right.
+            Look at the "top %" readout while you step. For the made-up place it's lower, the model is genuinely <span className="text-ink">less sure</span>, but it still commits, and nothing downstream sees that doubt. The fabricated answer arrives in the same authoritative tone as the real one. High probability is not the same as being right.
           </Lede>
         </Section>
 
@@ -192,7 +192,7 @@ export default function HallucinationApp() {
             {FIXES.map((it) => (
               <div key={it.k} className="rounded-sm border border-line bg-surface px-4 py-3">
                 <span className="font-mono text-xs uppercase tracking-wide text-primary">{it.k}</span>
-                <span className="text-sm text-ink/85"> — {it.v}</span>
+                <span className="text-sm text-ink/85"> · {it.v}</span>
               </div>
             ))}
           </div>
@@ -208,7 +208,7 @@ export default function HallucinationApp() {
         <Section id="recap" n="05" title="In one line">
           <H2>Hallucination is the default, not a bug</H2>
           <Lede>
-            A model that always predicts the most plausible next token will always produce <span className="text-ink">something</span> — even with nothing to go on. Making it trustworthy means giving it sources, citations, and permission to say "I don't know."
+            A model that always predicts the most plausible next token will always produce <span className="text-ink">something</span>, even with nothing to go on. Making it trustworthy means giving it sources, citations, and permission to say "I don't know."
           </Lede>
         </Section>
       </main>

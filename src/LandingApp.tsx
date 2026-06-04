@@ -1,8 +1,8 @@
 import { useDarkMode, ScrollProgress, TopBar, SeriesFooter } from './ui'
 
 const ITEMS = [
-  { href: 'rag/', n: '01', title: 'How RAG Actually Works', desc: 'Retrieval turns a guessing model into one that answers from real sources — and cites them.', color: '#ff4d00' },
-  { href: 'hallucination/', n: '02', title: 'Why LLMs Hallucinate', desc: 'A next-token predictor always emits something plausible — even when it has no idea.', color: '#2563eb' },
+  { href: 'rag/', n: '01', title: 'How RAG Actually Works', desc: 'Retrieval turns a guessing model into one that answers from real sources, and cites them.', color: '#ff4d00' },
+  { href: 'hallucination/', n: '02', title: 'Why LLMs Hallucinate', desc: 'A next-token predictor always emits something plausible, even when it has no idea.', color: '#2563eb' },
   { href: 'verifier/', n: '03', title: 'How a Verifier Works', desc: 'Generate many candidate answers, then keep only the one that actually checks out.', color: '#65a30d' },
 ]
 
@@ -19,7 +19,7 @@ export default function LandingApp() {
             <p className="mb-6 font-mono text-xs uppercase tracking-[0.2em] text-primary">A series · how AI actually works</p>
             <h1 className="font-display text-6xl font-semibold tracking-[-0.03em] text-ink sm:text-7xl">Explorable Explainers</h1>
             <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-muted sm:text-xl">
-              Short, interactive essays that take one AI idea apart, piece by piece — running entirely in your browser, no sign-ups, no API keys.
+              Short, interactive essays that take one AI idea apart, piece by piece, running entirely in your browser, no sign-ups, no API keys.
             </p>
             <div className="mt-7 flex items-center justify-center gap-2 font-mono text-xs text-faint">
               <span className="text-muted">Laela Zorana</span>

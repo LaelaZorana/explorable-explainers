@@ -60,7 +60,7 @@ export const PROMPTS: Prompt[] = [
         { tok: 'on', logit: 1.6 },
       ],
     ],
-    note: 'A fact the model saw thousands of times in training. Each distribution spikes hard on one token — very high confidence, and correct.',
+    note: 'A fact the model saw thousands of times in training. Each distribution spikes hard on one token: very high confidence, and correct.',
   },
   {
     id: 1,
@@ -90,6 +90,6 @@ export const PROMPTS: Prompt[] = [
         { tok: 'a', logit: 2.4 },
       ],
     ],
-    note: 'The Marenne Islands are fictional — the model has never seen them. The distributions are flat (no token is clearly right), yet it still commits to the most plausible-sounding one and writes "Marenne City": a confident fabrication. (That is exactly the made-up answer from the RAG explainer.)',
+    note: 'The Marenne Islands are fictional, so the model has never seen them. The distributions are flat (no token is clearly right), yet it still commits to the most plausible-sounding one and writes "Marenne City": a confident fabrication. (That is exactly the made-up answer from the RAG explainer.)',
   },
 ]

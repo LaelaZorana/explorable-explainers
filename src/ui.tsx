@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 
 /* ================================================================== *
- * The Lab — shared design-system primitives.
+ * The Lab: shared design-system primitives.
  * Both explainers import from here. Accent colour is set per-page by
  * wrapping the app in an `.accent-*` class (see index.css), so these
  * components stay colour-agnostic via var(--color-primary).

@@ -1,7 +1,7 @@
 /* ------------------------------------------------------------------ *
  * A tiny ARC-style task to show what a verifier does: a generator can
- * propose many candidate rules, but only a verifier — checking each
- * against the worked examples — can tell which one is actually right.
+ * propose many candidate rules, but only a verifier, checking each
+ * against the worked examples, can tell which one is actually right.
  * All deterministic, in-browser. No model, no keys.
  * ------------------------------------------------------------------ */
 

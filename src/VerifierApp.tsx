@@ -44,7 +44,7 @@ function VerifierLab() {
 
   return (
     <Card className="mt-8">
-      <div className="mb-2 font-mono text-xs uppercase tracking-wide text-muted">// two worked examples — the rule must reproduce both</div>
+      <div className="mb-2 font-mono text-xs uppercase tracking-wide text-muted">// two worked examples, the rule must reproduce both</div>
       <div className="mb-6 flex flex-wrap gap-x-8 gap-y-4">
         {TRAIN.map((ex, i) => (
           <Pair key={i} ex={ex} label={`example ${i + 1}`} />
@@ -100,7 +100,7 @@ function VerifierLab() {
 
       <div className="mt-6 border-t border-line pt-5">
         <div className="mb-3 font-mono text-xs uppercase tracking-wide text-muted">
-          {selected ? '// you picked' : verifierOn ? '// verifier selected' : '// no verifier — takes the first guess'}: <span className="text-ink">{rule.label}</span>
+          {selected ? '// you picked' : verifierOn ? '// verifier selected' : '// no verifier, takes the first guess'}: <span className="text-ink">{rule.label}</span>
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div>
@@ -116,8 +116,8 @@ function VerifierLab() {
         </div>
         <Callout tone={correct ? 'good' : 'bad'}>
           {correct
-            ? 'The verifier kept only the rule that reproduced every example, then applied it to the test — and got it right. That check is the entire trick.'
-            : 'With the verifier off, the system commits to a plausible-looking rule that never actually matched the examples — so it fails the test. Flip the verifier on.'}
+            ? 'The verifier kept only the rule that reproduced every example, then applied it to the test, and got it right. That check is the entire trick.'
+            : 'With the verifier off, the system commits to a plausible-looking rule that never actually matched the examples, so it fails the test. Flip the verifier on.'}
         </Callout>
       </div>
     </Card>
@@ -171,7 +171,7 @@ export default function VerifierApp() {
             <SectionLabel n="01" title="The problem" />
             <H2>One guess is a gamble</H2>
             <Lede>
-              Ask a model to infer a rule and it will confidently produce one — often the wrong one. The fix isn't a smarter single guess. It's to <span className="text-ink">generate several candidates</span> and add a second component that can tell which are actually correct: a <span className="text-ink">verifier</span>.
+              Ask a model to infer a rule and it will confidently produce one, often the wrong one. The fix isn't a smarter single guess. It's to <span className="text-ink">generate several candidates</span> and add a second component that can tell which are actually correct: a <span className="text-ink">verifier</span>.
             </Lede>
           </Reveal>
         </section>
@@ -179,7 +179,7 @@ export default function VerifierApp() {
         <Section id="lab" n="02" title="Generate & verify">
           <H2>Propose many, keep what checks out</H2>
           <Lede>
-            Here's a small ARC-style puzzle: infer the rule from two examples, then apply it to a new grid. The generator offers several plausible rules — but only the verifier, testing each against the examples, knows which one holds. Flip it off and on.
+            Here's a small ARC-style puzzle: infer the rule from two examples, then apply it to a new grid. The generator offers several plausible rules, but only the verifier, testing each against the examples, knows which one holds. Flip it off and on.
           </Lede>
           <VerifierLab />
         </Section>
@@ -187,14 +187,14 @@ export default function VerifierApp() {
         <Section id="why" n="03" title="Why it works">
           <H2>Checking is easier than guessing</H2>
           <Lede>
-            For many problems it's far easier to <span className="text-ink">verify</span> a candidate than to produce a correct one from scratch. So you spend compute generating lots of candidates and let a cheap, reliable check filter them. Generate more candidates and the odds that a correct one appears — and survives the verifier — climb fast. This generate-and-verify loop is exactly how today's strongest reasoning systems, and ARC-AGI solvers, turn raw guesses into dependable answers.
+            For many problems it's far easier to <span className="text-ink">verify</span> a candidate than to produce a correct one from scratch. So you spend compute generating lots of candidates and let a cheap, reliable check filter them. Generate more candidates and the odds that a correct one appears, and survives the verifier, climb fast. This generate-and-verify loop is exactly how today's strongest reasoning systems, and ARC-AGI solvers, turn raw guesses into dependable answers.
           </Lede>
         </Section>
 
         <Section id="recap" n="04" title="In one line">
           <H2>A model that can check itself can be trusted</H2>
           <Lede>
-            Generation is creative but unreliable; verification is narrow but dependable. Put them together — propose, check, select — and you get answers you can actually stand behind.
+            Generation is creative but unreliable; verification is narrow but dependable. Put them together (propose, check, select) and you get answers you can actually stand behind.
           </Lede>
         </Section>
       </main>

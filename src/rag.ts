@@ -1,6 +1,6 @@
 /* ------------------------------------------------------------------ *
  * A small, fully deterministic model of a RAG pipeline.
- * No network, no API keys — every step is computed in the browser so
+ * No network, no API keys. Every step is computed in the browser so
  * the explainer is honest about what it's showing and runs anywhere.
  * ------------------------------------------------------------------ */
 
@@ -100,7 +100,7 @@ export function chunkDocs(docs: Doc[], size: number, overlap: number): Chunk[] {
   return out
 }
 
-/* Fixed sentence-level chunks — the stable retrieval units used by the
+/* Fixed sentence-level chunks, the stable retrieval units used by the
  * embedding, retrieval and generation sections. */
 export const SENT_CHUNKS: Chunk[] = (() => {
   const out: Chunk[] = []
@@ -141,7 +141,7 @@ export const QUERIES: QueryItem[] = [
   {
     id: 3,
     text: 'What is the climate like?',
-    answer: 'The climate is mild and maritime — fog in the cool season, gentle trade winds in summer[[4]].',
+    answer: 'The climate is mild and maritime: fog in the cool season, gentle trade winds in summer[[4]].',
     sources: [4],
   },
   { id: 4, text: 'What currency do the islands use?', answer: '', sources: [], outOfScope: true },
@@ -169,7 +169,7 @@ function mulberry32(seed: number) {
 }
 
 /* A fixed random projection maps high-dim term vectors to 2D so we can
- * *look* at the embedding space — an approximation of the real geometry. */
+ * *look* at the embedding space, an approximation of the real geometry. */
 const PROJ: number[][] = (() => {
   const rnd = mulberry32(11)
   return VOCAB.map(() => [rnd() * 2 - 1, rnd() * 2 - 1])
