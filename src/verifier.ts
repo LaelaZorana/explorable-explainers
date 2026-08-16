@@ -30,15 +30,15 @@ export type Rule = { id: string; label: string; apply: (g: Grid) => Grid }
  * a plausible-but-wrong guess, so "no verifier" picks it). */
 export const RULES: Rule[] = [
   { id: 'rot180', label: 'Rotate 180°', apply: rotate180 },
-  { id: 'mirrorV', label: 'Mirror top–bottom', apply: mirrorV },
-  { id: 'mirrorH', label: 'Mirror left–right', apply: mirrorH },
+  { id: 'mirrorV', label: 'Mirror top to bottom', apply: mirrorV },
+  { id: 'mirrorH', label: 'Mirror left to right', apply: mirrorH },
   { id: 'swap12', label: 'Swap colours 1 ↔ 2', apply: (g) => swap(g, 1, 2) },
   { id: 'identity', label: 'Copy unchanged', apply: (g) => g },
 ]
 
 export type Example = { input: Grid; output: Grid }
 
-/* The hidden rule is "mirror left–right". */
+/* The hidden rule is "mirror left to right". */
 const TRAIN_INPUTS: Grid[] = [
   [
     [1, 0, 0],

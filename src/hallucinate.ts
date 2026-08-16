@@ -64,7 +64,7 @@ export const PROMPTS: Prompt[] = [
   },
   {
     id: 1,
-    label: 'A fact it does NOT know',
+    label: 'A fact it doesn\'t know',
     prefix: 'The capital of the Marenne Islands is',
     known: false,
     steps: [

@@ -198,7 +198,7 @@ export default function HallucinationApp() {
           </div>
           <Callout tone="primary">
             The companion explainer walks through the first fix end to end →{' '}
-            <a className="font-semibold text-primary underline" href="./">
+            <a className="font-semibold text-primary underline" href="../rag/">
               How RAG Actually Works
             </a>
             .

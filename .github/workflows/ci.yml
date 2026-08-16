@@ -12,7 +12,8 @@ permissions:
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Never cancel a run on main, because that run may be mid-deploy.
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   build:
@@ -48,3 +49,69 @@ jobs:
             fi
             echo "Found dist/$page"
           done
+
+      - name: Upload the built site
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist
+          if-no-files-found: error
+          retention-days: 7
+
+  deploy:
+    name: Publish to gh-pages
+    needs: build
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    concurrency:
+      group: deploy-gh-pages
+      cancel-in-progress: false
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Download the built site
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist
+
+      - name: Sanity check the build output
+        run: |
+          set -euo pipefail
+          for page in index.html rag/index.html hallucination/index.html verifier/index.html; do
+            if [ ! -f "dist/$page" ]; then
+              echo "Refusing to deploy, missing dist/$page" >&2
+              exit 1
+            fi
+          done
+          if [ ! -d dist/assets ]; then
+            echo "Refusing to deploy, missing dist/assets" >&2
+            exit 1
+          fi
+
+      - name: Publish dist to gh-pages
+        run: |
+          set -euo pipefail
+          git config user.name 'Laela Zorana'
+          git config user.email 'zoranalaela9@gmail.com'
+          git fetch origin gh-pages:gh-pages
+          git worktree add ../site gh-pages
+          rsync -a --delete --exclude '.git' dist/ ../site/
+          # GitHub Pages must serve the built files as-is, with no Jekyll pass.
+          touch ../site/.nojekyll
+          cd ../site
+          git add -A
+          if git diff --cached --quiet; then
+            echo "gh-pages already matches this build, nothing to publish."
+            exit 0
+          fi
+          git commit -m "Deploy: build of ${GITHUB_SHA}"
+          git push origin gh-pages
