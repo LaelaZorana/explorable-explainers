@@ -104,9 +104,27 @@ jobs:
           git config user.email 'zoranalaela9@gmail.com'
           git fetch origin gh-pages:gh-pages
           git worktree add ../site gh-pages
-          rsync -a --delete --exclude '.git' dist/ ../site/
+          # --checksum, because every page HTML is the same byte size from build
+          # to build and rsync's default size-plus-mtime check silently skips them.
+          rsync -a --checksum --delete --exclude '.git' dist/ ../site/
           # GitHub Pages must serve the built files as-is, with no Jekyll pass.
           touch ../site/.nojekyll
+          # Every asset each page references has to exist in what we are about to
+          # publish, otherwise the live site 404s its own scripts.
+          python3 - <<'PY'
+          import pathlib, re, sys
+          site = pathlib.Path('../site')
+          missing = []
+          for page in site.rglob('*.html'):
+              for ref in re.findall(r'(?:src|href)="((?!data:|https?:|#)[^"]+)"', page.read_text()):
+                  target = (page.parent / ref).resolve()
+                  if not target.exists():
+                      missing.append(f'{page.relative_to(site)} references missing {ref}')
+          if missing:
+              print('\n'.join(missing), file=sys.stderr)
+              sys.exit(1)
+          print('Every referenced asset is present.')
+          PY
           cd ../site
           git add -A
           if git diff --cached --quiet; then
